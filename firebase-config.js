@@ -6,12 +6,12 @@
 
 // ── Firebase project config ──────────────────
 var firebaseConfig = {
-  apiKey:            "AIzaSyBAnL4E-5az9pigw2cIu1RvIca_NsIShfY",
-  authDomain:        "tantan-1ca3f.firebaseapp.com",
-  projectId:         "tantan-1ca3f",
-  storageBucket:     "tantan-1ca3f.firebasestorage.app",
-  messagingSenderId: "196653466123",
-  appId:             "1:196653466123:web:79b60c0434853efd97fd0e"
+  apiKey:            "AIzaSyBjBhiOTOiFLUOZDcwLjgIfG4fUDcoxHkE",
+  authDomain:        "thefitshop-19e78.firebaseapp.com",
+  projectId:         "thefitshop-19e78",
+  storageBucket:     "thefitshop-19e78.firebasestorage.app",
+  messagingSenderId: "709892472456",
+  appId:             "1:709892472456:web:d114dd1e002c4a728c693d"
 };
 
 // ── Initialise Firebase ──────────────────────
