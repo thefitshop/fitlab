@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://images.unsplash.com; style-src 'self' 'unsafe-inline'; script-src 'self' https://www.gstatic.com; font-src 'self'; connect-src 'self' https://firestore.googleapis.com https://*.googleapis.com https://us-central1-tantan-1ca3f.cloudfunctions.net; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" />
+  <title>Owner Dashboard — THE FIT SHOP</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <link rel="stylesheet" href="dashboard.css?v=1" />
+</head>
+<body>
+
+  <!-- ── Login Screen ── -->
+  <div id="dash-login">
+    <div class="login-box">
+      <div class="login-logo">THE<em>FIT</em>SHOP</div>
+      <p class="login-subtitle">Owner Dashboard<br>Private access only — do not share this link.</p>
+      <label class="login-label" for="dash-password">Password</label>
+      <input type="password" id="dash-password" placeholder="Enter your password" />
+      <button class="login-btn" id="dash-login-btn">Access Dashboard →</button>
+      <p class="login-error" id="login-error"></p>
+    </div>
+  </div>
+
+  <!-- ── Dashboard App ── -->
+  <div id="dash-app" style="display:none">
+
+    <!-- Header -->
+    <header class="dash-header">
+      <div>
+        <span class="dash-header-logo">THE<em>FIT</em>SHOP</span>
+        <span class="dash-header-tag">Owner</span>
+      </div>
+      <div class="dash-header-right">
+        <span class="dash-owner-label">Private Dashboard</span>
+        <button class="dash-logout-btn" id="dash-logout">Log Out</button>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="dash-tabs">
+      <button class="dash-tab-btn active" data-tab="stock">📦 Stock</button>
+      <button class="dash-tab-btn" data-tab="orders">🧾 Orders</button>
+      <button class="dash-tab-btn" data-tab="customers">👥 Customers</button>
+      <button class="dash-tab-btn" data-tab="pl">💰 P&amp;L</button>
+      <button class="dash-tab-btn" data-tab="products">🏷️ Products</button>
+      <button class="dash-tab-btn" data-tab="popular">📊 Popular</button>
+      <button class="dash-tab-btn" data-tab="security">🛡️ Security</button>
+    </nav>
+
+    <!-- ── Stock Panel ── -->
+    <div class="dash-panel active" id="panel-stock">
+      <div class="dash-section-header">
+        <h2>📦 Stock Management</h2>
+        <button class="save-all-btn" id="save-all-stock">💾 Save All Changes</button>
+      </div>
+      <div id="low-stock-alert"></div>
+      <div class="dash-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category</th>
+              <th>Sale Price</th>
+              <th>Cost Price (£)</th>
+              <th>Stock Qty</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody id="stock-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Orders Panel ── -->
+    <div class="dash-panel" id="panel-orders">
+      <div class="dash-section-header">
+        <h2>🧾 Orders</h2>
+        <span id="order-count" style="font-size:0.875rem;color:var(--muted)"></span>
+      </div>
+      <div class="dash-table-wrap" id="orders-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Date &amp; Time</th>
+              <th>Customer</th>
+              <th>Items Ordered</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Delivery Status</th>
+              <th>Tracking</th>
+              <th>Royal Mail</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody"></tbody>
+        </table>
+      </div>
+      <div id="orders-empty" class="dash-empty" style="display:none">
+        <div class="dash-empty-icon">🧾</div>
+        <h3>No orders yet</h3>
+        <p>Orders placed through the website will appear here automatically.</p>
+      </div>
+    </div>
+
+    <!-- ── Customers Panel ── -->
+    <div class="dash-panel" id="panel-customers">
+      <div class="dash-section-header">
+        <h2>👥 Customer Information</h2>
+        <span id="customer-count" style="font-size:0.875rem;color:var(--muted)"></span>
+      </div>
+      <div class="cust-search-wrap">
+        <input type="text" id="cust-search" class="cust-search-input" placeholder="🔍  Search by name or email…" />
+      </div>
+      <div class="dash-table-wrap" id="customers-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Delivery Address</th>
+              <th>Products Ordered</th>
+              <th>Orders</th>
+              <th>Total Spent</th>
+              <th>Last Order</th>
+            </tr>
+          </thead>
+          <tbody id="customers-tbody"></tbody>
+        </table>
+      </div>
+      <div id="customers-empty" class="dash-empty" style="display:none">
+        <div class="dash-empty-icon">👥</div>
+        <h3>No customers yet</h3>
+        <p>Customer details are collected automatically when orders are placed.</p>
+      </div>
+      <div id="customers-no-results" class="dash-empty" style="display:none">
+        <div class="dash-empty-icon">🔍</div>
+        <h3>No results found</h3>
+        <p>Try a different name or email address.</p>
+      </div>
+    </div>
+
+    <!-- ── P&L Panel ── -->
+    <div class="dash-panel" id="panel-pl">
+      <div class="dash-section-header">
+        <h2>💰 Profit &amp; Loss</h2>
+      </div>
+      <div class="pl-cards" id="pl-cards"></div>
+
+      <p class="pl-subtitle">This Month — Weekly Breakdown</p>
+      <div class="dash-table-wrap" style="margin-bottom:2rem">
+        <table class="dash-table">
+          <thead>
+            <tr><th>Week</th><th>Orders</th><th>Revenue</th><th>Est. Cost</th><th>Profit</th></tr>
+          </thead>
+          <tbody id="pl-weekly-tbody"></tbody>
+        </table>
+      </div>
+
+      <p class="pl-subtitle">Monthly Summary — Last 6 Months</p>
+      <div class="dash-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr><th>Month</th><th>Orders</th><th>Revenue</th><th>Est. Cost</th><th>Profit</th></tr>
+          </thead>
+          <tbody id="pl-monthly-tbody"></tbody>
+        </table>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-top:1rem">
+        * Estimated cost uses the cost prices set in the Stock tab. Update those for accurate P&amp;L figures.
+      </p>
+    </div>
+
+    <!-- ── Products Panel ── -->
+    <div class="dash-panel" id="panel-products">
+      <div class="dash-section-header">
+        <h2>🏷️ Product Management</h2>
+        <button class="save-all-btn" id="save-all-products">💾 Save All Changes</button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem">Edit product names, prices and categories below. Use <strong>Save</strong> per row or <strong>Save All Changes</strong> to update everything. Use <strong>Delete</strong> to permanently remove a product.</p>
+
+      <!-- Category Name Editor -->
+      <div class="prod-mgmt-card">
+        <div class="prod-mgmt-card-title">📂 Edit Category Names</div>
+        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem">Rename any category — changes apply on the products page immediately.</p>
+        <div id="cat-names-grid"></div>
+      </div>
+
+      <!-- Add New Product -->
+      <div class="prod-mgmt-card">
+        <div class="prod-mgmt-card-header">
+          <div class="prod-mgmt-card-title">➕ Add New Product</div>
+          <button class="save-all-btn" id="add-prod-toggle">＋ New Product</button>
+        </div>
+        <div id="add-prod-form" style="display:none;margin-top:1.25rem">
+          <div class="add-prod-grid">
+            <div class="add-prod-field">
+              <label class="dash-field-label">Product Name *</label>
+              <input type="text" id="new-prod-name" class="dash-field-input" placeholder="e.g. Creatine Monohydrate" />
+            </div>
+            <div class="add-prod-field">
+              <label class="dash-field-label">Category *</label>
+              <select id="new-prod-cat" class="prod-cat-select" style="width:100%;max-width:100%"></select>
+            </div>
+            <div class="add-prod-field">
+              <label class="dash-field-label">Price (£) *</label>
+              <input type="number" id="new-prod-price" class="dash-field-input" min="0" step="0.01" placeholder="0.00" />
+            </div>
+            <div class="add-prod-field">
+              <label class="dash-field-label">Emoji</label>
+              <input type="text" id="new-prod-emoji" class="dash-field-input" placeholder="💪" maxlength="2" style="width:80px" />
+            </div>
+          </div>
+          <div class="add-prod-field" style="margin-top:0.75rem">
+            <label class="dash-field-label">Description *</label>
+            <textarea id="new-prod-desc" class="dash-field-textarea" rows="3" placeholder="Describe this product…"></textarea>
+          </div>
+          <div class="add-prod-field" style="margin-top:0.75rem">
+            <label class="dash-field-label">Visual Style</label>
+            <select id="new-prod-grad" class="prod-cat-select" style="width:100%;max-width:220px">
+              <option value="g1">Dark Navy</option>
+              <option value="g2">Electric Blue</option>
+              <option value="g3">Deep Purple</option>
+              <option value="g4">Midnight</option>
+              <option value="g5">Steel</option>
+              <option value="g6">Cyan Glow</option>
+              <option value="g7">Marine</option>
+              <option value="g8">Carbon</option>
+            </select>
+          </div>
+          <button class="save-all-btn" id="add-prod-submit" style="margin-top:1.25rem">+ Add Product</button>
+          <p id="add-prod-error" style="color:var(--danger);font-size:0.82rem;margin-top:0.5rem;min-height:1.2em"></p>
+        </div>
+      </div>
+
+      <div class="dash-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Product Name</th>
+              <th>Price (£)</th>
+              <th>Status</th>
+              <th>Action</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="products-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Popular Products Panel ── -->
+    <div class="dash-panel" id="panel-popular">
+      <div class="dash-section-header">
+        <h2>📊 Popular Products</h2>
+        <span style="font-size:0.875rem;color:var(--muted)">Based on all orders placed</span>
+      </div>
+      <div id="popular-empty" class="dash-empty" style="display:none">
+        <div class="dash-empty-icon">📊</div>
+        <h3>No orders yet</h3>
+        <p>Popular products will appear here once orders have been placed.</p>
+      </div>
+      <div id="popular-content">
+        <div class="pop-grid">
+          <div class="pop-card pop-card-gold">
+            <div class="pop-card-title">🏆 Top 5 Best Sellers</div>
+            <div id="pop-top5"></div>
+          </div>
+          <div class="pop-card pop-card-blue">
+            <div class="pop-card-title">📉 5 Least Ordered</div>
+            <div id="pop-bot5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Security Panel ── -->
+    <div class="dash-panel" id="panel-security">
+      <div class="dash-section-header">
+        <h2>🛡️ Security Log</h2>
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+          <span class="sec-live-badge">
+            <span class="sec-live-dot" id="sec-live-dot"></span>
+            Live
+          </span>
+          <span id="sec-last-checked" style="font-size:0.78rem;color:var(--muted)"></span>
+          <button class="save-all-btn" id="sec-clear-btn">🗑️ Clear Log</button>
+        </div>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem">
+        Blocked bot attempts detected by user-agent matching on the landing page. Polls every 3 seconds — new rows flash amber. Only JS-executing bots are captured here.
+      </p>
+      <div id="sec-summary" style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem"></div>
+      <div class="dash-table-wrap" id="sec-table-wrap">
+        <table class="dash-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date &amp; Time</th>
+              <th>Page</th>
+              <th>Reason</th>
+              <th>User Agent</th>
+            </tr>
+          </thead>
+          <tbody id="sec-tbody"></tbody>
+        </table>
+      </div>
+      <div id="sec-empty" class="dash-empty" style="display:none">
+        <div class="dash-empty-icon">🛡️</div>
+        <h3>No blocked attempts yet</h3>
+        <p>When a bot matching a blocked user-agent visits the landing page, it will be logged here.</p>
+      </div>
+    </div>
+
+  </div><!-- /#dash-app -->
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js?v=1"></script>
+  <script src="script.js?v=1"></script>
+  <script src="dashboard.js?v=1"></script>
+  <script src="dashboard-stock.js?v=1"></script>
+  <script src="dashboard-orders.js?v=1"></script>
+  <script src="dashboard-customers.js?v=1"></script>
+  <script src="dashboard-pl.js?v=1"></script>
+  <script src="dashboard-products.js?v=1"></script>
+  <script src="dashboard-popular.js?v=1"></script>
+  <script src="dashboard-security.js?v=1"></script>
+  <script src="dashboard-login.js?v=1"></script>
+</body>
+</html>
